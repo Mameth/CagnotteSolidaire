@@ -1,0 +1,11 @@
+C:\Users\Utilisateur\OneDrive\Bureau\COURS\CagnotteSolidaire\CagnotteSolidaire.Domain\bin\Debug\net8.0\CagnotteSolidaire.Domain.deps.json
+C:\Users\Utilisateur\OneDrive\Bureau\COURS\CagnotteSolidaire\CagnotteSolidaire.Domain\bin\Debug\net8.0\CagnotteSolidaire.Domain.dll
+C:\Users\Utilisateur\OneDrive\Bureau\COURS\CagnotteSolidaire\CagnotteSolidaire.Domain\bin\Debug\net8.0\CagnotteSolidaire.Domain.pdb
+C:\Users\Utilisateur\OneDrive\Bureau\COURS\CagnotteSolidaire\CagnotteSolidaire.Domain\obj\Debug\net8.0\CagnotteSolidaire.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Utilisateur\OneDrive\Bureau\COURS\CagnotteSolidaire\CagnotteSolidaire.Domain\obj\Debug\net8.0\CagnotteSolidaire.Domain.AssemblyInfoInputs.cache
+C:\Users\Utilisateur\OneDrive\Bureau\COURS\CagnotteSolidaire\CagnotteSolidaire.Domain\obj\Debug\net8.0\CagnotteSolidaire.Domain.AssemblyInfo.cs
+C:\Users\Utilisateur\OneDrive\Bureau\COURS\CagnotteSolidaire\CagnotteSolidaire.Domain\obj\Debug\net8.0\CagnotteSolidaire.Domain.csproj.CoreCompileInputs.cache
+C:\Users\Utilisateur\OneDrive\Bureau\COURS\CagnotteSolidaire\CagnotteSolidaire.Domain\obj\Debug\net8.0\CagnotteSolidaire.Domain.dll
+C:\Users\Utilisateur\OneDrive\Bureau\COURS\CagnotteSolidaire\CagnotteSolidaire.Domain\obj\Debug\net8.0\refint\CagnotteSolidaire.Domain.dll
+C:\Users\Utilisateur\OneDrive\Bureau\COURS\CagnotteSolidaire\CagnotteSolidaire.Domain\obj\Debug\net8.0\CagnotteSolidaire.Domain.pdb
+C:\Users\Utilisateur\OneDrive\Bureau\COURS\CagnotteSolidaire\CagnotteSolidaire.Domain\obj\Debug\net8.0\ref\CagnotteSolidaire.Domain.dll
