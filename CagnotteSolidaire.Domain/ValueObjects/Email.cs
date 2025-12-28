@@ -1,33 +1,38 @@
-using CagnotteSolidaire.Domain.Exceptions;
-using System.Text.RegularExpressions;
-
 namespace CagnotteSolidaire.Domain.ValueObjects;
 
-public sealed class Email
+using System.Text.RegularExpressions;
+
+
+public sealed class Email : IEquatable<Email>
 {
-    public string Valeur { get; }
+    private static readonly Regex EmailRegex =
+        new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
 
-    private Email(string valeur)
-    {
-        Valeur = valeur;
+    public string Value { get; }
+
+    public Email(string value)
+    {if (string.IsNullOrWhiteSpace(value))
+        throw new ArgumentException("Email invalide.", nameof(value));
+
+    value = value.Trim().ToLowerInvariant();
+
+    if (!EmailRegex.IsMatch(value))
+        throw new ArgumentException("Email invalide.", nameof(value));
+    
+
+        Value = value;
     }
 
-    public static Email Creer(string valeur)
-    {
-        if (string.IsNullOrWhiteSpace(valeur))
-            throw new BusinessException("L'email est obligatoire.");
-
-        if (!Regex.IsMatch(valeur, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-            throw new BusinessException("Format d'email invalide.");
-
-        return new Email(valeur);
-    }
-
-    public override string ToString() => Valeur;
+    public bool Equals(Email? other)
+        => other != null && Value == other.Value;
 
     public override bool Equals(object? obj)
-        => obj is Email other && Valeur == other.Valeur;
+        => Equals(obj as Email);
 
     public override int GetHashCode()
-        => Valeur.GetHashCode();
+        => Value.GetHashCode();
+
+    public override string ToString()
+        => Value;
 }
+

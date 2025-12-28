@@ -1,27 +1,31 @@
-using CagnotteSolidaire.Domain.Exceptions;
-
 namespace CagnotteSolidaire.Domain.ValueObjects;
 
-public sealed class Money
+
+public sealed class Money : IEquatable<Money>
 {
-    public decimal Valeur { get; }
+    public decimal Value { get; }
 
-    private Money(decimal valeur)
+    public Money(decimal value)
     {
-        Valeur = valeur;
+        if (value <= 0)
+        throw new ArgumentOutOfRangeException(
+            nameof(value),
+            value,
+            "Le montant doit être strictement supérieur à zéro."
+        );
+
+        Value = value;
     }
 
-    public static Money Creer(decimal valeur)
-    {
-        if (valeur < 0)
-            throw new BusinessException("Un montant ne peut pas être négatif.");
+    public bool Equals(Money? other)
+        => other != null && Value == other.Value;
 
-        return new Money(valeur);
-    }
+    public override bool Equals(object? obj)
+        => Equals(obj as Money);
 
-    public static Money operator +(Money a, Money b)
-        => new Money(a.Valeur + b.Valeur);
+    public override int GetHashCode()
+        => Value.GetHashCode();
 
     public override string ToString()
-        => Valeur.ToString("0.00");
+        => Value.ToString("0.00");
 }

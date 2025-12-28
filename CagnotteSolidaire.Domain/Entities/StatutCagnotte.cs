@@ -1,8 +1,8 @@
-namespace CagnotteSolidaire.Domain.Enums;
+namespace CagnotteSolidaire.Domain.Entities;
 
 public enum StatutCagnotte
 {
-    Ouverte,
+    EnCours,
     Cloturee,
     Annulee
 }

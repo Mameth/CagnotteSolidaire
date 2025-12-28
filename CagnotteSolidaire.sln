@@ -5,15 +5,15 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CagnotteSolidaire.Domain", "CagnotteSolidaire.Domain\CagnotteSolidaire.Domain.csproj", "{E6352C37-654F-48D1-8140-4575309A124F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CagnotteSolidaire.Application", "CagnotteSolidaire.Application\CagnotteSolidaire.Application.csproj", "{429D24A9-390B-453D-8CFD-0C74DAF5524B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CagnotteSolidaire.Infrastructure", "CagnotteSolidaire.Infrastructure\CagnotteSolidaire.Infrastructure.csproj", "{A81802B2-5CC6-4841-B4EC-DD8E460A1FA1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CagnotteSolidaire.API", "CagnotteSolidaire.API\CagnotteSolidaire.API.csproj", "{E8EB36D5-D36E-4D24-B876-3C7C0243182E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CagnotteSolidaire.Blazor", "CagnotteSolidaire.Blazor\CagnotteSolidaire.Blazor.csproj", "{80D46FA2-4771-46BF-AAFD-13B5759C50EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CagnotteSolidaire.Tests", "CagnotteSolidaire.Tests\CagnotteSolidaire.Tests.csproj", "{90F2AFB2-A595-4A76-8CCB-196F330F5DEF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CagnotteSolidaire.Domain.Tests", "CagnotteSolidaire.Domain.Tests\CagnotteSolidaire.Domain.Tests.csproj", "{A410A477-4B85-479F-AB67-0F075C9701CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CagnotteSolidaire.Infrastructure.Tests", "CagnotteSolidaire.Infrastructure.Tests\CagnotteSolidaire.Infrastructure.Tests.csproj", "{BC8558F5-3877-4F4D-BA3D-A8D671D84C30}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,6 +97,30 @@ Global
 		{90F2AFB2-A595-4A76-8CCB-196F330F5DEF}.Release|x64.Build.0 = Release|Any CPU
 		{90F2AFB2-A595-4A76-8CCB-196F330F5DEF}.Release|x86.ActiveCfg = Release|Any CPU
 		{90F2AFB2-A595-4A76-8CCB-196F330F5DEF}.Release|x86.Build.0 = Release|Any CPU
+		{A410A477-4B85-479F-AB67-0F075C9701CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A410A477-4B85-479F-AB67-0F075C9701CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A410A477-4B85-479F-AB67-0F075C9701CF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A410A477-4B85-479F-AB67-0F075C9701CF}.Debug|x64.Build.0 = Debug|Any CPU
+		{A410A477-4B85-479F-AB67-0F075C9701CF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A410A477-4B85-479F-AB67-0F075C9701CF}.Debug|x86.Build.0 = Debug|Any CPU
+		{A410A477-4B85-479F-AB67-0F075C9701CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A410A477-4B85-479F-AB67-0F075C9701CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A410A477-4B85-479F-AB67-0F075C9701CF}.Release|x64.ActiveCfg = Release|Any CPU
+		{A410A477-4B85-479F-AB67-0F075C9701CF}.Release|x64.Build.0 = Release|Any CPU
+		{A410A477-4B85-479F-AB67-0F075C9701CF}.Release|x86.ActiveCfg = Release|Any CPU
+		{A410A477-4B85-479F-AB67-0F075C9701CF}.Release|x86.Build.0 = Release|Any CPU
+		{BC8558F5-3877-4F4D-BA3D-A8D671D84C30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC8558F5-3877-4F4D-BA3D-A8D671D84C30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC8558F5-3877-4F4D-BA3D-A8D671D84C30}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BC8558F5-3877-4F4D-BA3D-A8D671D84C30}.Debug|x64.Build.0 = Debug|Any CPU
+		{BC8558F5-3877-4F4D-BA3D-A8D671D84C30}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BC8558F5-3877-4F4D-BA3D-A8D671D84C30}.Debug|x86.Build.0 = Debug|Any CPU
+		{BC8558F5-3877-4F4D-BA3D-A8D671D84C30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC8558F5-3877-4F4D-BA3D-A8D671D84C30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC8558F5-3877-4F4D-BA3D-A8D671D84C30}.Release|x64.ActiveCfg = Release|Any CPU
+		{BC8558F5-3877-4F4D-BA3D-A8D671D84C30}.Release|x64.Build.0 = Release|Any CPU
+		{BC8558F5-3877-4F4D-BA3D-A8D671D84C30}.Release|x86.ActiveCfg = Release|Any CPU
+		{BC8558F5-3877-4F4D-BA3D-A8D671D84C30}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

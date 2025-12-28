@@ -1,37 +1,19 @@
-using CagnotteSolidaire.Domain.Enums;
-using CagnotteSolidaire.Domain.Exceptions;
 using CagnotteSolidaire.Domain.ValueObjects;
 
-namespace CagnotteSolidaire.Domain.Entities;
-
-public class Utilisateur
+public abstract class Utilisateur
 {
-    public Guid Id { get; private set; }
-    public string Nom { get; private set; }
-    public string Prenom { get; private set; }
-    public Email Email { get; private set; }
-    public RoleUtilisateur Role { get; private set; }
-
+    public Guid Id { get; protected set; }
+    public string Nom { get; protected set; } = string.Empty;
+    public string Prenom { get; protected set; } = string.Empty;
+    public Email Email { get; protected set; } = null!;
+    
     protected Utilisateur() { }
 
-    public Utilisateur(string nom, string prenom, Email email, RoleUtilisateur role)
+    protected Utilisateur(Guid id, string nom, string prenom, Email email)
     {
-        if (string.IsNullOrWhiteSpace(nom))
-            throw new BusinessException("Le nom est obligatoire.");
-
-        if (string.IsNullOrWhiteSpace(prenom))
-            throw new BusinessException("Le prénom est obligatoire.");
-
-        Id = Guid.NewGuid();
+        Id = id;
         Nom = nom;
         Prenom = prenom;
-        Email = email ?? throw new BusinessException("L'email est obligatoire.");
-        Role = role;
+        Email = email;
     }
-
-    public bool EstGestionnaire()
-        => Role == RoleUtilisateur.Gestionnaire;
-
-    public bool EstParticipant()
-        => Role == RoleUtilisateur.Participant;
 }

@@ -1,30 +1,17 @@
-using CagnotteSolidaire.Domain.Exceptions;
-
-namespace CagnotteSolidaire.Domain.Entities;
-
 public class Association
 {
-    public Guid Id { get; private set; }
-    public string Nom { get; private set; }
-    public string IdentifiantOfficiel { get; private set; } // RNA ou SIREN
-    public string Departement { get; private set; }
+    public Guid Id { get; protected set; }
+    public string Nom { get; protected set; } = string.Empty;
+    public string NumeroRNA { get; protected set; } = string.Empty;
+    public string Departement { get; protected set; } = string.Empty;
 
-    protected Association() { }
+    protected Association() { } // EF Core
 
-    public Association(string nom, string identifiantOfficiel, string departement)
+    public Association(Guid id, string nom, string numeroRna, string departement)
     {
-        if (string.IsNullOrWhiteSpace(nom))
-            throw new BusinessException("Le nom de l'association est obligatoire.");
-
-        if (string.IsNullOrWhiteSpace(identifiantOfficiel))
-            throw new BusinessException("L'identifiant officiel est obligatoire.");
-
-        if (departement != "68")
-            throw new BusinessException("L'association doit être dans le département 68.");
-
-        Id = Guid.NewGuid();
+        Id = id;
         Nom = nom;
-        IdentifiantOfficiel = identifiantOfficiel;
+        NumeroRNA = numeroRna;
         Departement = departement;
     }
 }
