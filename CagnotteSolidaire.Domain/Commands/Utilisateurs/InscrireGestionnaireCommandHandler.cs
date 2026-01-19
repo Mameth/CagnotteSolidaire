@@ -31,13 +31,23 @@ public class InscrireGestionnaireCommandHandler
         if (existingUser != null)
             throw new InvalidOperationException("Email déjà utilisé");
 
-        // 2️⃣ Association existante
+
+        // 2️⃣ Récupération de l’association
         var association =
             await _associationRepository.GetById(command.AssociationId);
 
         if (association == null)
-            throw new InvalidOperationException("Association inconnue");
+        {
+            // ⚠️ Cas normal : association trouvée via JO mais pas encore en base
+            association = new Association(
+                command.AssociationId,
+                command.AssociationNom,
+                command.AssociationRna,
+                "68"
+            );
 
+            await _associationRepository.Add(association);
+        }
         // 3️⃣ Création du gestionnaire
         var gestionnaire = new Gestionnaire(
             Guid.NewGuid(),

@@ -1,4 +1,3 @@
-using CagnotteSolidaire.Domain.Repositories;
 using CagnotteSolidaire.Domain.Commands.Utilisateurs;
 using CagnotteSolidaire.Domain.Entities;
 using CagnotteSolidaire.Domain.Tests.Mocks;
@@ -28,10 +27,12 @@ public class InscrireGestionnaireHandlerTests
             assocRepo);
 
         var command = new InscrireGestionnaireCommand(
-            "Durand",
-            "Alice",
-            "alice@asso.fr",
-            association.Id
+            Nom: "Durand",
+            Prenom: "Alice",
+            Email: "alice@asso.fr",
+            AssociationId: association.Id,
+            AssociationNom: association.Nom,
+            AssociationRna: association.NumeroRNA
         );
 
         // Act
@@ -42,8 +43,9 @@ public class InscrireGestionnaireHandlerTests
     }
 
     [Fact]
-    public async Task InscrireGestionnaire_AssociationInconnue_ThrowException()
+    public async Task InscrireGestionnaire_AssociationInconnue_CreeAssociationPuisGestionnaire()
     {
+        // Arrange
         var userRepo = new UtilisateurRepositoryMock();
         var assocRepo = new AssociationRepositoryMock();
 
@@ -52,14 +54,18 @@ public class InscrireGestionnaireHandlerTests
             assocRepo);
 
         var command = new InscrireGestionnaireCommand(
-            "Durand",
-            "Alice",
-            "alice@asso.fr",
-            Guid.NewGuid()
+            Nom: "Durand",
+            Prenom: "Alice",
+            Email: "alice@asso.fr",
+            AssociationId: Guid.NewGuid(),
+            AssociationNom: "Association Inconnue",
+            AssociationRna: "W999999999"
         );
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            handler.Handle(command, CancellationToken.None)
-        );
+        // Act
+        var id = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        Assert.NotEqual(Guid.Empty, id);
     }
 }

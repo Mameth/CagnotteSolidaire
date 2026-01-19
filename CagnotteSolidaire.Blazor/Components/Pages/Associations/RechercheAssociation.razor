@@ -1,0 +1,38 @@
+
+@using CagnotteSolidaire.Blazor.Services
+
+@inject AssociationApiService AssociationService
+
+<h3>Recherche d'association</h3>
+
+<input @bind="terme" placeholder="Nom, RNA..." />
+<button @onclick="Rechercher">Rechercher</button>
+
+<ul>
+    @foreach (var assoc in resultats)
+    {
+        <li>
+            <button @onclick="() => Selectionner(assoc)">
+                @assoc.Nom (@assoc.NumeroRNA)
+            </button>
+        </li>
+    }
+</ul>
+
+@code {
+    private string terme = "";
+    private List<AssociationDTO> resultats = new List<AssociationDTO>();
+
+    [Parameter]
+    public EventCallback<AssociationDTO> OnSelection { get; set; }
+
+    private async Task Rechercher()
+    {
+        resultats = await AssociationService.Rechercher(terme);
+    }
+
+    private async Task Selectionner(AssociationDTO assoc)
+    {
+        await OnSelection.InvokeAsync(assoc);
+    }
+}

@@ -1,0 +1,77 @@
+@page "/inscription-gestionnaire"
+
+@using CagnotteSolidaire.Blazor.Models
+@using CagnotteSolidaire.Blazor.Services
+@using CagnotteSolidaire.Blazor.Components.Pages.Associations
+
+
+
+@inject UtilisateurApiService UtilisateurService
+
+<h3>Inscription Gestionnaire</h3>
+
+<EditForm Model="model" OnValidSubmit="Inscrire" FormName="inscriptionGestionnaire">
+    <div>
+        <input @bind="model.Nom" placeholder="Nom" />
+        <input @bind="model.Prenom" placeholder="Prénom" />
+        <input @bind="model.Email" placeholder="Email" />
+    </div>
+
+    <hr />
+
+    <h4>Association</h4>
+
+    <RechercheAssociation OnSelection="OnAssociationSelectionnee" />
+
+    @if (!string.IsNullOrEmpty(model.AssociationNom))
+    {
+        <p>
+            ✅ Association sélectionnée :
+            <strong>@model.AssociationNom</strong>
+            (@model.AssociationRna)
+        </p>
+    }
+
+    <button type="submit" disabled="@(!AssociationSelectionnee)">
+        S'inscrire
+    </button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <p>@message</p>
+}
+
+@code {
+    private InscriptionGestionnaireModel model = new();
+    private string? message;
+
+    private bool AssociationSelectionnee =>
+        model.AssociationId != Guid.Empty;
+
+    private void OnAssociationSelectionnee(AssociationDTO assoc)
+    {
+        model.AssociationId = assoc.Id;
+        model.AssociationNom = assoc.Nom;
+        model.AssociationRna = assoc.NumeroRNA;
+    }
+
+    private async Task Inscrire()
+    {
+        try
+        {
+            await UtilisateurService.InscrireGestionnaire(
+                model.Nom,
+                model.Prenom,
+                model.Email,
+                model.AssociationId,
+                model.AssociationNom,
+                model.AssociationRna);
+            message = "✅ Gestionnaire inscrit avec succès";
+        }
+        catch
+        {
+            message = "❌ Erreur lors de l'inscription";
+        }
+    }
+}

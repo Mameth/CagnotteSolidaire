@@ -1,0 +1,49 @@
+@page "/inscription-participant"
+
+@using CagnotteSolidaire.Blazor.Models
+@using CagnotteSolidaire.Blazor.Services
+@inject UtilisateurApiService UtilisateurService
+
+<h3>Inscription Participant</h3>
+
+<EditForm Model="model" OnValidSubmit="Inscrire"
+          FormName="inscriptionParticipant">
+    <DataAnnotationsValidator />
+
+    <div>
+        <input @bind="model.Nom" placeholder="Nom" />
+    </div>
+
+    <div>
+        <input @bind="model.Prenom" placeholder="Prénom" />
+    </div>
+
+    <div>
+        <input @bind="model.Email" placeholder="Email" />
+    </div>
+
+    <button type="submit">S'inscrire</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <p>@message</p>
+}
+
+@code {
+    private InscriptionParticipantModel model = new();
+    private string? message;
+
+    private async Task Inscrire()
+    {
+        try
+        {
+            await UtilisateurService.InscrireParticipant(model);
+            message = "✅ Inscription réussie";
+        }
+        catch (Exception ex)
+        {
+            message = "❌ Erreur : " + ex.Message;
+        }
+    }
+}

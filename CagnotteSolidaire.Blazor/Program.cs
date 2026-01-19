@@ -1,9 +1,18 @@
 ﻿using CagnotteSolidaire.Blazor.Components;
-
+using CagnotteSolidaire.Blazor.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddScoped(sp =>
+    new HttpClient { BaseAddress = new Uri("https://localhost:5009/") });
+
+builder.Services.AddScoped<UtilisateurApiService>();
+builder.Services.AddScoped<AssociationApiService>();
+
 
 var app = builder.Build();
 

@@ -1,44 +1,72 @@
+using CagnotteSolidaire.Domain.Commands.Utilisateurs;
+using CagnotteSolidaire.Domain.Repositories;
+using CagnotteSolidaire.Infrastructure.Persistence;
+using CagnotteSolidaire.Infrastructure.Repositories;
+using CagnotteSolidaire.Domain.Services;
+using CagnotteSolidaire.Infrastructure.Services;
+
+
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+//
+// Controllers
+//
+builder.Services.AddControllers();
+
+//
+// Swagger (utile pour tests API)
+//
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//
+// DbContext EF Core
+//
+builder.Services.AddDbContext<CagnotteDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"))
+);
+var cs = builder.Configuration.GetConnectionString("DefaultConnection");
+Console.WriteLine(">>> CONNECTION STRING = " + cs);
+
+//
+// Repositories (Domain -> Infrastructure)
+//
+builder.Services.AddScoped<IUtilisateurRepository, UtilisateurRepository>();
+builder.Services.AddScoped<IAssociationRepository, AssociationRepository>();
+
+//
+// MediatR (Domain Commands / Queries)
+//
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(typeof(InscrireParticipantCommand).Assembly)
+);
+
+
+builder.Services.AddHttpClient<IJoAssociationService, JoAssociationService>(client =>
+{
+    client.BaseAddress = new Uri(
+        "https://journal-officiel-datadila.opendatasoft.com");
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+//
+// Pipeline HTTP
+//
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.UseAuthorization();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
