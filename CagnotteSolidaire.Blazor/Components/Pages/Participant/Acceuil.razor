@@ -1,0 +1,6 @@
+﻿@page "/participant"
+@layout CagnotteSolidaire.Blazor.Components.Layout.AuthenticatedLayout
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Participant")]
+
+<h1>Espace Participant</h1>
+<p>Vous pouvez participer à une cagnotte si vous connaissez son identifiant.</p>

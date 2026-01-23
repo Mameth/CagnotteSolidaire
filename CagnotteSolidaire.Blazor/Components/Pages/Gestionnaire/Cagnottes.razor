@@ -1,0 +1,51 @@
+﻿@page "/gestionnaire/cagnottes"
+@layout CagnotteSolidaire.Blazor.Components.Layout.AuthenticatedLayout
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Gestionnaire")]
+@inject CagnotteSolidaire.Blazor.Services.CagnotteApiService CagnotteApiService
+
+<h1>Mes cagnottes</h1>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <div class="alert">@message</div>
+}
+
+@if (cagnottes == null)
+{
+    <p>Chargement...</p>
+}
+else if (cagnottes.Count == 0)
+{
+    <p>Aucune cagnotte.</p>
+}
+else
+{
+    <div class="list">
+        @foreach (var c in cagnottes)
+        {
+            <div class="item">
+                <div class="title">@c.Titre</div>
+                <div class="muted">@c.Statut</div>
+                <div class="muted">Objectif: @c.Objectif — Actuel: @c.MontantActuel</div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<CagnotteSolidaire.Blazor.Models.CagnotteDTO>? cagnottes;
+    private string? message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            cagnottes = await CagnotteApiService.GetMesCagnottes();
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+            cagnottes = new();
+        }
+    }
+}

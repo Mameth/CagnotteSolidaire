@@ -12,46 +12,45 @@ public class UtilisateurApiService
         _http = http;
     }
 
-    // 🔹 INSCRIPTION PARTICIPANT
     public async Task InscrireParticipant(InscriptionParticipantModel model)
     {
         var payload = new
         {
-            nom = model.Nom,
-            prenom = model.Prenom,
-            email = model.Email
+            Nom = model.Nom,
+            Prenom = model.Prenom,
+            Email = model.Email,
+            MotDePasse = model.MotDePasse
         };
 
-        var response = await _http.PostAsJsonAsync(
-            "api/utilisateurs/participants",
-            payload);
+        var response = await _http.PostAsJsonAsync("api/utilisateurs/participants", payload);
 
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            throw new Exception(error);
+        }
     }
 
-    // 🔹 INSCRIPTION GESTIONNAIRE (rappel)
-    public async Task InscrireGestionnaire(
-        string nom,
-        string prenom,
-        string email,
-        Guid associationId,
-        string associationNom,
-        string associationRna)
+    public async Task InscrireGestionnaire(InscriptionGestionnaireModel model)
     {
         var payload = new
         {
-            nom,
-            prenom,
-            email,
-            associationId,
-            associationNom,
-            associationRna
+            Nom = model.Nom,
+            Prenom = model.Prenom,
+            Email = model.Email,
+            MotDePasse = model.MotDePasse,
+
+            AssociationId = model.AssociationId!.Value.ToString(),
+            AssociationNom = model.AssociationNom,
+            AssociationRna = model.AssociationRna
         };
 
-        var response = await _http.PostAsJsonAsync(
-            "api/utilisateurs/gestionnaires",
-            payload);
+        var response = await _http.PostAsJsonAsync("api/utilisateurs/gestionnaires", payload);
 
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            throw new Exception(error);
+        }
     }
 }

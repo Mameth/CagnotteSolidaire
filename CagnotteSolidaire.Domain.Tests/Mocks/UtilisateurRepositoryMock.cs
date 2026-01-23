@@ -13,6 +13,12 @@ public class UtilisateurRepositoryMock : IUtilisateurRepository
         return Task.FromResult(user);
     }
 
+    public Task<Utilisateur?> GetById(Guid id)
+    {
+        var user = _utilisateurs.FirstOrDefault(u => u.Id == id);
+        return Task.FromResult(user);
+    }
+
     public Task Add(Utilisateur utilisateur)
     {
         _utilisateurs.Add(utilisateur);

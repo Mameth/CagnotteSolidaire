@@ -1,0 +1,6 @@
+﻿@page "/gestionnaire"
+@layout CagnotteSolidaire.Blazor.Components.Layout.AuthenticatedLayout
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Gestionnaire")]
+
+<h1>Espace Gestionnaire</h1>
+<p>Gérez vos cagnottes depuis le menu.</p>

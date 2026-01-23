@@ -51,6 +51,52 @@ namespace CagnotteSolidaire.Infrastructure.Migrations
                     b.ToTable("Associations");
                 });
 
+            modelBuilder.Entity("CagnotteSolidaire.Domain.Entities.Cagnotte", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AssociationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nom")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Statut")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssociationId");
+
+                    b.ToTable("Cagnottes");
+                });
+
+            modelBuilder.Entity("Participation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CagnotteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ParticipantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CagnotteId");
+
+                    b.ToTable("Participations");
+                });
+
             modelBuilder.Entity("Utilisateur", b =>
                 {
                     b.Property<Guid>("Id")
@@ -91,11 +137,94 @@ namespace CagnotteSolidaire.Infrastructure.Migrations
                     b.HasDiscriminator().HasValue("Gestionnaire");
                 });
 
-            modelBuilder.Entity("Participant", b =>
+            modelBuilder.Entity("CagnotteSolidaire.Domain.Entities.Participant", b =>
                 {
                     b.HasBaseType("Utilisateur");
 
                     b.HasDiscriminator().HasValue("Participant");
+                });
+
+            modelBuilder.Entity("CagnotteSolidaire.Domain.Entities.Cagnotte", b =>
+                {
+                    b.HasOne("Association", "Association")
+                        .WithMany()
+                        .HasForeignKey("AssociationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("CagnotteSolidaire.Domain.ValueObjects.Money", "MontantActuel", b1 =>
+                        {
+                            b1.Property<Guid>("CagnotteId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<decimal>("Value")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("decimal(18,2)")
+                                .HasColumnName("MontantActuel");
+
+                            b1.HasKey("CagnotteId");
+
+                            b1.ToTable("Cagnottes");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CagnotteId");
+                        });
+
+                    b.OwnsOne("CagnotteSolidaire.Domain.ValueObjects.Money", "Objectif", b1 =>
+                        {
+                            b1.Property<Guid>("CagnotteId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<decimal>("Value")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("decimal(18,2)")
+                                .HasColumnName("Objectif");
+
+                            b1.HasKey("CagnotteId");
+
+                            b1.ToTable("Cagnottes");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CagnotteId");
+                        });
+
+                    b.Navigation("Association");
+
+                    b.Navigation("MontantActuel")
+                        .IsRequired();
+
+                    b.Navigation("Objectif")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Participation", b =>
+                {
+                    b.HasOne("CagnotteSolidaire.Domain.Entities.Cagnotte", null)
+                        .WithMany("Participations")
+                        .HasForeignKey("CagnotteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("CagnotteSolidaire.Domain.ValueObjects.Money", "Montant", b1 =>
+                        {
+                            b1.Property<Guid>("ParticipationId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<decimal>("Value")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("decimal(18,2)")
+                                .HasColumnName("Montant");
+
+                            b1.HasKey("ParticipationId");
+
+                            b1.ToTable("Participations");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ParticipationId");
+                        });
+
+                    b.Navigation("Montant")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Utilisateur", b =>
@@ -120,6 +249,11 @@ namespace CagnotteSolidaire.Infrastructure.Migrations
 
                     b.Navigation("Email")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("CagnotteSolidaire.Domain.Entities.Cagnotte", b =>
+                {
+                    b.Navigation("Participations");
                 });
 #pragma warning restore 612, 618
         }

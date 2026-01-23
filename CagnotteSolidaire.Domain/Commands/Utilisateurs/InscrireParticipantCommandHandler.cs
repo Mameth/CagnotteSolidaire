@@ -29,7 +29,8 @@ public class InscrireParticipantHandler
             Guid.NewGuid(),
             request.Nom,
             request.Prenom,
-            email);
+            email,
+            request.MotDePasse);
 
         await _utilisateurRepository.Add(participant);
 

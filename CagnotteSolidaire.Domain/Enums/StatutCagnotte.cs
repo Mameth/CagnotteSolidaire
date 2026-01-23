@@ -1,4 +1,4 @@
-namespace CagnotteSolidaire.Domain.Entities;
+namespace CagnotteSolidaire.Domain.Enums;
 
 public enum StatutCagnotte
 {

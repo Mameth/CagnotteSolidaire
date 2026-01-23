@@ -20,6 +20,12 @@ public class UtilisateurRepository : IUtilisateurRepository
             .FirstOrDefaultAsync(u => u.Email.Value == email);
     }
 
+    public Task<Utilisateur?> GetById(Guid id)
+    {
+        return _context.Utilisateurs
+            .FirstOrDefaultAsync(u => u.Id == id);
+    }
+
     public async Task Add(Utilisateur utilisateur)
     {
         _context.Utilisateurs.Add(utilisateur);

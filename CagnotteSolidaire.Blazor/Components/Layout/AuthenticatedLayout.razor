@@ -1,0 +1,45 @@
+﻿@inherits Microsoft.AspNetCore.Components.LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+@inject CagnotteSolidaire.Blazor.Services.IAuthService AuthService
+@inject NavigationManager Navigation
+
+<div class="shell">
+    <div class="topbar">
+        <div class="brand">Cagnotte Solidaire</div>
+
+        <AuthorizeView>
+            <Authorized>
+                <div class="nav">
+                    @if (context.User.IsInRole("Gestionnaire"))
+                    {
+                        <NavLink href="/gestionnaire" Match="NavLinkMatch.All">Accueil</NavLink>
+                        <NavLink href="/gestionnaire/cagnottes">Mes cagnottes</NavLink>
+                        <NavLink href="/gestionnaire/cagnottes/creer">Créer</NavLink>
+                    }
+
+                    @if (context.User.IsInRole("Participant"))
+                    {
+                        <NavLink href="/participant" Match="NavLinkMatch.All">Accueil</NavLink>
+                        <NavLink href="/participant/participer">Participer</NavLink>
+                    }
+
+                    <button class="btn" @onclick='() => Logout()'>Déconnexion</button>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+    </div>
+
+    <div class="content">
+        <div class="card">
+            @Body
+        </div>
+    </div>
+</div>
+
+@code {
+    private async Task Logout()
+    {
+        await AuthService.Logout();
+        Navigation.NavigateTo("/", forceLoad: true);
+    }
+}

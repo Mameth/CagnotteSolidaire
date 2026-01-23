@@ -1,77 +1,140 @@
-@page "/inscription-gestionnaire"
-
+@page "/utilisateurs/inscription-gestionnaire"
 @using CagnotteSolidaire.Blazor.Models
 @using CagnotteSolidaire.Blazor.Services
-@using CagnotteSolidaire.Blazor.Components.Pages.Associations
+@inject AssociationApiService AssoService
+@inject UtilisateurApiService UserService
+@inject NavigationManager Navigation
 
+<PageTitle>Inscription Gestionnaire</PageTitle>
 
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white text-center py-3">
+                    <h3>🏛️ Espace Association</h3>
+                </div>
+                <div class="card-body p-4">
 
-@inject UtilisateurApiService UtilisateurService
+                    @if (!associationSelectionnee)
+                    {
+                        <h5 class="text-primary mb-3">Étape 1 : Identifiez votre association</h5>
+                        
+                        <div class="input-group mb-3">
+                            <input @bind="termeRecherche" class="form-control" placeholder="Nom ou RNA..." @onkeyup="@(async e => { if (e.Key == "Enter") await Rechercher(); })" />
+                            <button class="btn btn-primary" @onclick="Rechercher">Rechercher</button>
+                        </div>
 
-<h3>Inscription Gestionnaire</h3>
+                        @if (resultats != null)
+                        {
+                            <ul class="list-group">
+                                @foreach (var asso in resultats)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>@asso.Nom</strong><br/>
+                                            <small class="text-muted">RNA: @asso.NumeroRNA</small>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-success" @onclick="() => ChoisirAsso(asso)">
+                                            C'est la mienne
+                                        </button>
+                                    </li>
+                                }
+                            </ul>
+                            @if (resultats.Count == 0) { <p class="text-muted">Aucune association trouvée.</p> }
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <strong>Association sélectionnée :</strong> @model.AssociationNom (@model.AssociationRna)
+                            <button class="btn btn-link btn-sm p-0 ms-2" @onclick="AnnulerChoix">(Changer)</button>
+                        </div>
 
-<EditForm Model="model" OnValidSubmit="Inscrire" FormName="inscriptionGestionnaire">
-    <div>
-        <input @bind="model.Nom" placeholder="Nom" />
-        <input @bind="model.Prenom" placeholder="Prénom" />
-        <input @bind="model.Email" placeholder="Email" />
+                        <h5 class="text-primary mb-3">Étape 2 : Vos informations de connexion</h5>
+
+                        <EditForm Model="model" OnValidSubmit="Inscrire" FormName="inscriptionGest">
+                            <DataAnnotationsValidator />
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>Nom</label>
+                                    <InputText @bind-Value="model.Nom" class="form-control" />
+                                    <ValidationMessage For="@(() => model.Nom)" />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Prénom</label>
+                                    <InputText @bind-Value="model.Prenom" class="form-control" />
+                                    <ValidationMessage For="@(() => model.Prenom)" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Email</label>
+                                <InputText @bind-Value="model.Email" class="form-control" />
+                                <ValidationMessage For="@(() => model.Email)" />
+                            </div>
+
+                            <div class="mb-4">
+                                <label>Mot de passe</label>
+                                <InputText @bind-Value="model.MotDePasse" type="password" class="form-control" />
+                                <ValidationMessage For="@(() => model.MotDePasse)" />
+                            </div>
+
+                            <button type="submit" class="btn btn-dark w-100 py-2">Créer le compte Gestionnaire</button>
+                        </EditForm>
+                    }
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger mt-3">@errorMessage</div>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
-
-    <hr />
-
-    <h4>Association</h4>
-
-    <RechercheAssociation OnSelection="OnAssociationSelectionnee" />
-
-    @if (!string.IsNullOrEmpty(model.AssociationNom))
-    {
-        <p>
-            ✅ Association sélectionnée :
-            <strong>@model.AssociationNom</strong>
-            (@model.AssociationRna)
-        </p>
-    }
-
-    <button type="submit" disabled="@(!AssociationSelectionnee)">
-        S'inscrire
-    </button>
-</EditForm>
-
-@if (!string.IsNullOrEmpty(message))
-{
-    <p>@message</p>
-}
+</div>
 
 @code {
+    private string termeRecherche = "";
+    private List<AssociationDTO>? resultats;
+    private bool associationSelectionnee = false;
     private InscriptionGestionnaireModel model = new();
-    private string? message;
+    private string? errorMessage;
 
-    private bool AssociationSelectionnee =>
-        model.AssociationId != Guid.Empty;
-
-    private void OnAssociationSelectionnee(AssociationDTO assoc)
+    private async Task Rechercher()
     {
-        model.AssociationId = assoc.Id;
-        model.AssociationNom = assoc.Nom;
-        model.AssociationRna = assoc.NumeroRNA;
+        if (string.IsNullOrWhiteSpace(termeRecherche)) return;
+        resultats = await AssoService.Rechercher(termeRecherche);
+    }
+
+    private void ChoisirAsso(AssociationDTO asso)
+    {
+        model.AssociationId = asso.Id; 
+        model.AssociationNom = asso.Nom;
+        model.AssociationRna = asso.NumeroRNA;
+        
+        if (model.AssociationId == Guid.Empty) model.AssociationId = Guid.NewGuid();
+        associationSelectionnee = true;
+    }
+
+    private void AnnulerChoix()
+    {
+        associationSelectionnee = false;
+        resultats = null;
     }
 
     private async Task Inscrire()
     {
+        errorMessage = null;
         try
         {
-            await UtilisateurService.InscrireGestionnaire(
-                model.Nom,
-                model.Prenom,
-                model.Email,
-                model.AssociationId,
-                model.AssociationNom,
-                model.AssociationRna);
-            message = "✅ Gestionnaire inscrit avec succès";
+            await UserService.InscrireGestionnaire(model);
+            Navigation.NavigateTo("/login");
         }
-        catch
+        catch (Exception ex)
         {
-            message = "❌ Erreur lors de l'inscription";
+            errorMessage = "Erreur : " + ex.Message;
         }
     }
 }

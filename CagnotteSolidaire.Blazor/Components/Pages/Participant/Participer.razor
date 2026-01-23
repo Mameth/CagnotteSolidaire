@@ -1,0 +1,116 @@
+﻿@page "/participant/participer"
+@layout CagnotteSolidaire.Blazor.Components.Layout.AuthenticatedLayout
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Participant")]
+@using CagnotteSolidaire.Blazor.Models
+@inject CagnotteSolidaire.Blazor.Services.CagnotteApiService CagnotteApiService
+@using System.ComponentModel.DataAnnotations
+
+
+
+<h1>Participer</h1>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <div class="alert">@message</div>
+}
+
+<EditForm Model="form" OnValidSubmit="LoadCagnotte">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="field">
+        <label>Identifiant de cagnotte (GUID)</label>
+        <InputText class="input" @bind-Value="cagnotteIdText" />
+    </div>
+
+    <button class="btn" type="submit">Afficher</button>
+</EditForm>
+
+@if (cagnotte != null)
+{
+    <div class="spacer"></div>
+
+    <h2>@cagnotte.Titre</h2>
+    <p>@cagnotte.Description</p>
+
+    <div class="kv">
+        <div><strong>Objectif</strong></div><div>@cagnotte.Objectif</div>
+        <div><strong>Montant actuel</strong></div><div>@cagnotte.MontantActuel</div>
+        <div><strong>Statut</strong></div><div>@cagnotte.Statut</div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <EditForm Model="don" OnValidSubmit="DoDon">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="field">
+            <label>Montant</label>
+            <InputNumber class="input" @bind-Value="don.Montant" />
+        </div>
+
+        <button class="btn" type="submit">Valider la participation</button>
+    </EditForm>
+}
+
+@code {
+    private string? message;
+
+    private string cagnotteIdText = "";
+    private CagnotteDTO? cagnotte;
+
+    private Dummy form = new();
+    private ParticipationForm don = new();
+
+    private async Task LoadCagnotte()
+    {
+        message = null;
+        cagnotte = null;
+
+        if (!Guid.TryParse(cagnotteIdText, out var id))
+        {
+            message = "Identifiant invalide.";
+            return;
+        }
+
+        var result = await CagnotteApiService.GetCagnotteById(id);
+        if (result == null)
+        {
+            message = "Cagnotte introuvable.";
+            return;
+        }
+
+        cagnotte = result;
+    }
+
+    private async Task DoDon()
+    {
+        message = null;
+
+        if (cagnotte == null)
+        {
+            message = "Veuillez d'abord charger une cagnotte.";
+            return;
+        }
+
+        try
+        {
+            await CagnotteApiService.Participer(cagnotte.Id, don.Montant);
+            message = "Participation enregistrée.";
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+        }
+    }
+
+    private sealed class Dummy { }
+
+    private sealed class ParticipationForm
+    {
+        [Required(ErrorMessage = "Le montant est requis")]
+        [Range(1, 1000000, ErrorMessage = "Le montant doit être positif")]
+        public decimal Montant { get; set; }
+    }
+}

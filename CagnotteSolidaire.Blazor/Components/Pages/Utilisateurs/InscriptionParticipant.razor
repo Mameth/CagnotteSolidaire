@@ -1,49 +1,77 @@
 @page "/inscription-participant"
-
 @using CagnotteSolidaire.Blazor.Models
 @using CagnotteSolidaire.Blazor.Services
 @inject UtilisateurApiService UtilisateurService
+@inject NavigationManager Navigation
 
-<h3>Inscription Participant</h3>
+<PageTitle>Inscription Participant</PageTitle>
 
-<EditForm Model="model" OnValidSubmit="Inscrire"
-          FormName="inscriptionParticipant">
-    <DataAnnotationsValidator />
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-success text-white text-center py-3">
+                    <h3 class="mb-0">Devenir Donateur</h3>
+                </div>
+                <div class="card-body p-4">
+                    <EditForm Model="model" OnValidSubmit="Inscrire" FormName="inscriptionPart">
+                        <DataAnnotationsValidator />
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nom</label>
+                                <InputText @bind-Value="model.Nom" class="form-control" />
+                                <ValidationMessage For="@(() => model.Nom)" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Prénom</label>
+                                <InputText @bind-Value="model.Prenom" class="form-control" />
+                                <ValidationMessage For="@(() => model.Prenom)" />
+                            </div>
+                        </div>
 
-    <div>
-        <input @bind="model.Nom" placeholder="Nom" />
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <InputText @bind-Value="model.Email" class="form-control" type="email" />
+                            <ValidationMessage For="@(() => model.Email)" />
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Mot de passe</label>
+                            <InputText @bind-Value="model.MotDePasse" class="form-control" type="password" />
+                            <ValidationMessage For="@(() => model.MotDePasse)" />
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 py-2">Créer mon compte</button>
+                    </EditForm>
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger mt-3">@errorMessage</div>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div>
-        <input @bind="model.Prenom" placeholder="Prénom" />
-    </div>
-
-    <div>
-        <input @bind="model.Email" placeholder="Email" />
-    </div>
-
-    <button type="submit">S'inscrire</button>
-</EditForm>
-
-@if (!string.IsNullOrEmpty(message))
-{
-    <p>@message</p>
-}
+</div>
 
 @code {
-    private InscriptionParticipantModel model = new();
-    private string? message;
+    [SupplyParameterFromForm]
+    private InscriptionParticipantModel model { get; set; } = new();
+    private string? errorMessage;
 
     private async Task Inscrire()
     {
+        errorMessage = null;
         try
         {
             await UtilisateurService.InscrireParticipant(model);
-            message = "✅ Inscription réussie";
+            // Succès -> On envoie vers le login
+            Navigation.NavigateTo("/login");
         }
         catch (Exception ex)
         {
-            message = "❌ Erreur : " + ex.Message;
+            errorMessage = "Erreur : " + ex.Message;
         }
     }
 }

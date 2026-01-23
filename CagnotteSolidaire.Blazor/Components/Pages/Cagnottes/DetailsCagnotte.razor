@@ -1,0 +1,149 @@
+﻿@page "/cagnotte/{Id:guid}"
+@using CagnotteSolidaire.Blazor.Models
+@using CagnotteSolidaire.Blazor.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@inject CagnotteApiService CagnotteService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<div class="container mt-5">
+    @if (errorMessage != null)
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+    else if (cagnotte == null)
+    {
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p>Chargement de la cagnotte...</p>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">@cagnotte.Titre</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h5>Description</h5>
+                        <p class="lead">@cagnotte.Description</p>
+                    </div>
+                    <div class="col-md-4 text-center border-start">
+                        <h5>Objectif</h5>
+                        <h3 class="text-primary">@cagnotte.Objectif €</h3>
+                        <hr/>
+                        <h5>Récolté</h5>
+                        <h3 class="text-success">@cagnotte.MontantActuel €</h3>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <label>Progression : @CalculerPourcentage()%</label>
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" 
+                             role="progressbar" 
+                             style="width: @(CalculerPourcentage())%">
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4"/>
+
+                <AuthorizeView Roles="Participant">
+                    <Authorized>
+                        <div class="card bg-light border-success">
+                            <div class="card-body">
+                                <h4 class="card-title text-success">Je participe !</h4>
+                                <p>Faites une promesse de don pour soutenir ce projet.</p>
+                                
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">Montant (€)</span>
+                                    <input type="number" class="form-control" @bind="montantDon" min="1" />
+                                    <button class="btn btn-success" @onclick="FaireUnDon">Valider ma participation</button>
+                                </div>
+                                
+                                @if (!string.IsNullOrEmpty(successMessage))
+                                {
+                                    <div class="alert alert-success">@successMessage</div>
+                                }
+                            </div>
+                        </div>
+                    </Authorized>
+                    <NotAuthorized>
+                        <div class="alert alert-warning d-flex align-items-center">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            <div>
+                                Vous devez être connecté en tant que <strong>Participant</strong> pour faire un don.
+                                <a href="/login" class="fw-bold text-dark ms-2">Se connecter</a> ou 
+                                <a href="/inscription-participant" class="fw-bold text-dark">S'inscrire</a>.
+                            </div>
+                        </div>
+                    </NotAuthorized>
+                </AuthorizeView>
+
+                <AuthorizeView Roles="Gestionnaire">
+                    <div class="alert alert-info mt-3">
+                        Vous visualisez cette cagnotte en tant que Gestionnaire.
+                    </div>
+                </AuthorizeView>
+
+            </div>
+            <div class="card-footer text-muted text-end">
+                Statut : <strong>@cagnotte.Statut</strong>
+            </div>
+        </div>
+        <div class="mt-3">
+            <a href="/mes-cagnottes" class="btn btn-outline-secondary">← Retour</a>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private CagnotteDTO? cagnotte;
+    private string? errorMessage;
+    private string? successMessage;
+    private decimal montantDon = 10; // Montant par défaut
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            cagnotte = await CagnotteService.GetCagnotteById(Id);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Impossible de charger la cagnotte. Elle n'existe peut-être pas.";
+        }
+    }
+
+    private int CalculerPourcentage()
+    {
+        if (cagnotte == null || cagnotte.Objectif == 0) return 0;
+        var p = (int)((cagnotte.MontantActuel / cagnotte.Objectif) * 100);
+        return p > 100 ? 100 : p;
+    }
+
+    private async Task FaireUnDon()
+    {
+        try
+        {
+            successMessage = "";
+            await CagnotteService.Participer(Id, montantDon);
+            successMessage = $"Merci ! Votre participation de {montantDon} € a été enregistrée.";
+            
+            // On recharge la cagnotte pour voir le montant augmenter
+            cagnotte = await CagnotteService.GetCagnotteById(Id);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Erreur lors du don : {ex.Message}";
+        }
+    }
+}

@@ -1,0 +1,167 @@
+﻿@page "/gestionnaire/auth"
+@using CagnotteSolidaire.Blazor.Models
+@using CagnotteSolidaire.Blazor.Components.Pages.Associations
+@inject CagnotteSolidaire.Blazor.Services.IAuthService AuthService
+@inject CagnotteSolidaire.Blazor.Services.UtilisateurApiService UtilisateurApiService
+@inject NavigationManager Navigation
+
+<h1>Gestionnaire</h1>
+
+<div class="tabs">
+    <button class="tab @(mode=="login" ? "active" : "")" @onclick='() => SetMode("login")'>Connexion</button>
+    <button class="tab @(mode=="register" ? "active" : "")" @onclick='() => SetMode("register")'>Inscription</button>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <div class="alert">@message</div>
+}
+
+@if (mode == "login")
+{
+    <EditForm Model="login" OnValidSubmit="DoLogin">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="field">
+            <label>Email</label>
+            <InputText class="input" @bind-Value="login.Email" />
+        </div>
+
+        <div class="field">
+            <label>Mot de passe</label>
+            <InputText class="input" @bind-Value="login.Password" type="password" />
+        </div>
+
+        <button class="btn" type="submit">Se connecter</button>
+    </EditForm>
+}
+else
+{
+    <div class="section">
+        <h2>1) Choisir l'association</h2>
+
+        <RechercheAssociation OnSelection="OnAssocSelection" />
+
+        @if (assocSelected)
+        {
+            <div class="chip">
+                Association sélectionnée :
+                <strong>@model.AssociationNom</strong>
+                — @model.AssociationRna
+            </div>
+        }
+    </div>
+
+    <div class="section">
+        <h2>2) Créer le compte</h2>
+
+        <EditForm Model="model" OnValidSubmit="DoRegister">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="field">
+                <label>Nom</label>
+                <InputText class="input" @bind-Value="model.Nom" />
+            </div>
+
+            <div class="field">
+                <label>Prénom</label>
+                <InputText class="input" @bind-Value="model.Prenom" />
+            </div>
+
+            <div class="field">
+                <label>Email</label>
+                <InputText class="input" @bind-Value="model.Email" />
+            </div>
+
+            <div class="field">
+                <label>Mot de passe</label>
+                <InputText class="input" @bind-Value="model.MotDePasse" type="password" />
+            </div>
+
+            <button class="btn"
+                    type="submit"
+                    disabled="@(!assocSelected || isSubmitting)">
+                Créer mon compte
+            </button>
+        </EditForm>
+    </div>
+}
+
+<div class="spacer"></div>
+<button class="btn secondary" @onclick='() => Navigation.NavigateTo("/")'>Retour</button>
+
+@code {
+    private string mode = "login";
+    private string? message;
+    private bool isSubmitting = false;
+    private bool assocSelected = false;
+
+    private LoginModel login = new();
+    private InscriptionGestionnaireModel model = new();
+
+    private void SetMode(string m)
+    {
+        mode = m;
+        message = null;
+    }
+
+    private void OnAssocSelection(AssociationDTO assoc)
+    {
+        model.AssociationId = assoc.Id;
+        model.AssociationNom = assoc.Nom;
+        model.AssociationRna = assoc.NumeroRNA;
+
+        assocSelected = true;
+        StateHasChanged();
+    }
+
+    private async Task DoLogin()
+    {
+        message = null;
+
+        var err = await AuthService.Login(login);
+        if (err != null)
+        {
+            message = err;
+            return;
+        }
+
+        Navigation.NavigateTo("/gestionnaire", forceLoad: true);
+    }
+
+    private async Task DoRegister()
+    {
+        if (isSubmitting)
+            return;
+
+        isSubmitting = true;
+        message = null;
+
+        try
+        {
+            await UtilisateurApiService.InscrireGestionnaire(model);
+
+            login.Email = model.Email;
+            login.Password = model.MotDePasse;
+
+            var err = await AuthService.Login(login);
+            if (err != null)
+            {
+                message = err;
+                return;
+            }
+
+            Navigation.NavigateTo("/gestionnaire", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

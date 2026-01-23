@@ -7,7 +7,7 @@ public sealed class Money : IEquatable<Money>
 
     public Money(decimal value)
     {
-        if (value <= 0)
+        if (value < 0)
         throw new ArgumentOutOfRangeException(
             nameof(value),
             value,

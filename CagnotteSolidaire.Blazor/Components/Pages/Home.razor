@@ -1,7 +1,35 @@
-﻿@page "/"
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject CagnotteSolidaire.Blazor.Services.IAuthService AuthService
+@inject NavigationManager Navigation
 
-<PageTitle>Home</PageTitle>
+<nav>
+    <NavLink href="" Match="NavLinkMatch.All">Accueil</NavLink>
 
-<h1>Hello, world!</h1>
+    <AuthorizeView>
+        <Authorized>
+            <hr style="border-color: #555;">
+            
+            <AuthorizeView Roles="Gestionnaire" Context="authContext">
+                <NavLink href="mes-cagnottes">Mes Cagnottes</NavLink>
+                <NavLink href="creer-cagnotte">Créer une cagnotte</NavLink>
+            </AuthorizeView>
 
-Welcome to your new app.
+            <button @onclick="Logout">Se déconnecter</button>
+        </Authorized>
+        
+        <NotAuthorized>
+            <hr style="border-color: #555;">
+            <NavLink href="login">Se connecter</NavLink>
+            <NavLink href="inscription-participant">Devenir Donateur</NavLink>
+            <NavLink href="inscription-gestionnaire">Créer une Asso</NavLink>
+        </NotAuthorized>
+    </AuthorizeView>
+</nav>
+
+@code {
+    private async Task Logout()
+    {
+        await AuthService.Logout();
+        Navigation.NavigateTo("/", forceLoad: true);
+    }
+}

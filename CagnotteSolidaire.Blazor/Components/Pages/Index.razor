@@ -1,0 +1,11 @@
+﻿@page "/"
+
+@inject NavigationManager Navigation
+
+<h1>Bienvenue</h1>
+<p>Choisissez votre espace.</p>
+
+<div class="grid2">
+    <button class="btn" @onclick='() => Navigation.NavigateTo("/gestionnaire/auth")'>Gestionnaire</button>
+    <button class="btn" @onclick='() => Navigation.NavigateTo("/participant/auth")'>Participant</button>
+</div>

@@ -3,6 +3,7 @@ using CagnotteSolidaire.Domain.ValueObjects;
 using CagnotteSolidaire.Domain.Queries.Utilisateurs;
 using CagnotteSolidaire.Domain.Tests.Mocks;
 using Xunit;
+using CagnotteSolidaire.Domain.Entities;
 
 namespace CagnotteSolidaire.Domain.Tests.Queries.Utilisateurs;
 

@@ -7,7 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Components\Pages\Cagnottes\" />
+    <Folder Include="Components\Pages\Gestionnaire\" />
+    <Folder Include="Components\Pages\Participant\" />
   </ItemGroup>
 
 </Project>

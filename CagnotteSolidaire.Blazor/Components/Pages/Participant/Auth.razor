@@ -1,0 +1,134 @@
+﻿@page "/participant/auth"
+@using CagnotteSolidaire.Blazor.Models
+@inject CagnotteSolidaire.Blazor.Services.IAuthService AuthService
+@inject CagnotteSolidaire.Blazor.Services.UtilisateurApiService UtilisateurApiService
+@inject NavigationManager Navigation
+
+<h1>Participant</h1>
+
+<div class="tabs">
+    <button class="tab @(mode=="login" ? "active" : "")" @onclick='() => SetMode("login")'>Connexion</button>
+    <button class="tab @(mode=="register" ? "active" : "")" @onclick='() => SetMode("register")'>Inscription</button>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <div class="alert">@message</div>
+}
+
+@if (mode == "login")
+{
+    <EditForm Model="login" OnValidSubmit="DoLogin">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="field">
+            <label>Email</label>
+            <InputText class="input" @bind-Value="login.Email" />
+        </div>
+
+        <div class="field">
+            <label>Mot de passe</label>
+            <InputText class="input" @bind-Value="login.Password" type="password" />
+        </div>
+
+        <button class="btn" type="submit">Se connecter</button>
+    </EditForm>
+}
+else
+{
+    <EditForm Model="register" OnValidSubmit="DoRegister">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="field">
+            <label>Nom</label>
+            <InputText class="input" @bind-Value="register.Nom" />
+        </div>
+
+        <div class="field">
+            <label>Prénom</label>
+            <InputText class="input" @bind-Value="register.Prenom" />
+        </div>
+
+        <div class="field">
+            <label>Email</label>
+            <InputText class="input" @bind-Value="register.Email" />
+        </div>
+
+        <div class="field">
+            <label>Mot de passe</label>
+            <InputText class="input" @bind-Value="register.MotDePasse" type="password" />
+        </div>
+
+        <button class="btn" type="submit" disabled="@isSubmitting">
+            Créer mon compte
+        </button>
+    </EditForm>
+}
+
+<div class="spacer"></div>
+<button class="btn secondary" @onclick='() => Navigation.NavigateTo("/")'>Retour</button>
+
+@code {
+    private string mode = "login";
+    private string? message;
+    private bool isSubmitting = false;
+
+    private LoginModel login = new();
+    private InscriptionParticipantModel register = new();
+
+    private void SetMode(string m)
+    {
+        mode = m;
+        message = null;
+    }
+
+    private async Task DoLogin()
+    {
+        message = null;
+
+        var err = await AuthService.Login(login);
+        if (err != null)
+        {
+            message = err;
+            return;
+        }
+
+        Navigation.NavigateTo("/participant", forceLoad: true);
+    }
+
+    private async Task DoRegister()
+    {
+        if (isSubmitting)
+            return;
+
+        isSubmitting = true;
+        message = null;
+
+        try
+        {
+            await UtilisateurApiService.InscrireParticipant(register);
+
+            login.Email = register.Email;
+            login.Password = register.MotDePasse;
+
+            var err = await AuthService.Login(login);
+            if (err != null)
+            {
+                message = err;
+                return;
+            }
+
+            Navigation.NavigateTo("/participant", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

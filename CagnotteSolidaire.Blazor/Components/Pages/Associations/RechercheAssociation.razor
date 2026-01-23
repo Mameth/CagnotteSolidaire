@@ -1,27 +1,31 @@
-
 @using CagnotteSolidaire.Blazor.Services
-
 @inject AssociationApiService AssociationService
 
-<h3>Recherche d'association</h3>
+<div class="section">
+    <div class="field">
+        <label>Recherche</label>
+        <InputText class="input" @bind-Value="terme" placeholder="Nom, RNA..." />
+    </div>
 
-<input @bind="terme" placeholder="Nom, RNA..." />
-<button @onclick="Rechercher">Rechercher</button>
+    <button class="btn" @onclick="Rechercher">Rechercher</button>
 
-<ul>
-    @foreach (var assoc in resultats)
+    @if (resultats.Count > 0)
     {
-        <li>
-            <button @onclick="() => Selectionner(assoc)">
-                @assoc.Nom (@assoc.NumeroRNA)
-            </button>
-        </li>
+        <div class="list">
+            @foreach (var assoc in resultats)
+            {
+                <button class="item buttonlike" @onclick="() => Selectionner(assoc)">
+                    <div class="title">@assoc.Nom</div>
+                    <div class="muted">@assoc.NumeroRNA</div>
+                </button>
+            }
+        </div>
     }
-</ul>
+</div>
 
 @code {
     private string terme = "";
-    private List<AssociationDTO> resultats = new List<AssociationDTO>();
+    private List<AssociationDTO> resultats = new();
 
     [Parameter]
     public EventCallback<AssociationDTO> OnSelection { get; set; }
@@ -35,4 +39,6 @@
     {
         await OnSelection.InvokeAsync(assoc);
     }
+
+    
 }

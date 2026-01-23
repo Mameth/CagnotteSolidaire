@@ -1,6 +1,5 @@
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using CagnotteSolidaire.Domain.Queries.Associations;
+using CagnotteSolidaire.Domain.Services;
 
 namespace CagnotteSolidaire.API.Controllers;
 
@@ -8,19 +7,23 @@ namespace CagnotteSolidaire.API.Controllers;
 [Route("api/associations")]
 public class AssociationsController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly IJoAssociationService _joService;
 
-    public AssociationsController(IMediator mediator)
+    public AssociationsController(IJoAssociationService joService)
     {
-        _mediator = mediator;
+        _joService = joService;
     }
 
     [HttpGet("recherche")]
     public async Task<IActionResult> Rechercher([FromQuery] string q)
     {
-        var result = await _mediator.Send(
-            new RechercherAssociationsQuery(q));
+        Console.WriteLine($"[API] Recherche reçue pour : {q}"); // Log pour voir si ça arrive
 
-        return Ok(result);
+        if (string.IsNullOrWhiteSpace(q))
+            return BadRequest("Le terme de recherche est vide.");
+
+        var resultats = await _joService.Rechercher(q, "68");
+
+        return Ok(resultats);
     }
 }

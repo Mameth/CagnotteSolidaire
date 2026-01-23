@@ -1,0 +1,55 @@
+﻿@page "/gestionnaire/cagnottes/creer"
+@layout CagnotteSolidaire.Blazor.Components.Layout.AuthenticatedLayout
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Gestionnaire")]
+@using CagnotteSolidaire.Blazor.Models
+@inject CagnotteSolidaire.Blazor.Services.CagnotteApiService CagnotteApiService
+@inject NavigationManager Navigation
+
+<h1>Créer une cagnotte</h1>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <div class="alert">@message</div>
+}
+
+<EditForm Model="model" OnValidSubmit="Submit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="field">
+        <label>Titre</label>
+        <InputText class="input" @bind-Value="model.Titre" />
+    </div>
+
+    <div class="field">
+        <label>Description</label>
+        <InputTextArea class="input" @bind-Value="model.Description" />
+    </div>
+
+    <div class="field">
+        <label>Objectif</label>
+        <InputNumber class="input" @bind-Value="model.Objectif" />
+    </div>
+
+    <button class="btn" type="submit">Créer</button>
+</EditForm>
+
+@code {
+    private CreationCagnotteModel model = new();
+    private string? message;
+
+    private async Task Submit()
+    {
+        message = null;
+
+        try
+        {
+            await CagnotteApiService.CreerCagnotte(model);
+            Navigation.NavigateTo("/gestionnaire/cagnottes", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+        }
+    }
+}

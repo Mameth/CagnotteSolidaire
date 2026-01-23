@@ -1,0 +1,83 @@
+﻿@page "/creer-cagnotte"
+@using Microsoft.AspNetCore.Authorization
+@using CagnotteSolidaire.Blazor.Models
+@using CagnotteSolidaire.Blazor.Services
+@inject CagnotteApiService CagnotteService
+@inject NavigationManager Navigation
+
+<PageTitle>Créer une Cagnotte</PageTitle>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h3 class="mb-0"><i class="bi bi-rocket-takeoff"></i> Lancer une nouvelle cagnotte</h3>
+                </div>
+                <div class="card-body p-4">
+                    
+                    <EditForm Model="model" OnValidSubmit="HandleCreation" FormName="creationCagnotte">
+                        <DataAnnotationsValidator />
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Titre du projet</label>
+                            <InputText @bind-Value="model.Titre" class="form-control form-control-lg" placeholder="Ex: Financement voyage scolaire" />
+                            <ValidationMessage For="@(() => model.Titre)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Description complète</label>
+                            <InputTextArea @bind-Value="model.Description" class="form-control" rows="4" placeholder="Expliquez votre projet aux donateurs..." />
+                            <ValidationMessage For="@(() => model.Description)" />
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Objectif Financier (€)</label>
+                            <div class="input-group">
+                                <InputNumber @bind-Value="model.Objectif" class="form-control" />
+                                <span class="input-group-text">€</span>
+                            </div>
+                            <ValidationMessage For="@(() => model.Objectif)" />
+                            <div class="form-text">Le montant que vous souhaitez atteindre.</div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="mes-cagnottes" class="btn btn-outline-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-success px-5">🚀 Créer la cagnotte</button>
+                        </div>
+                    </EditForm>
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger mt-3">
+                            <i class="bi bi-exclamation-triangle"></i> @errorMessage
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private CreationCagnotteModel model { get; set; } = new();
+    
+    private string? errorMessage;
+
+    private async Task HandleCreation()
+    {
+        errorMessage = null;
+        try
+        {
+            await CagnotteService.CreerCagnotte(model);
+            // Succès -> Retour au tableau de bord
+            Navigation.NavigateTo("/mes-cagnottes");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erreur lors de la création : " + ex.Message;
+        }
+    }
+}
